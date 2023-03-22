@@ -15,10 +15,11 @@ from email.mime.text import MIMEText
 
 
 def index(request):
-    return render(request, "login/login.html")
+    return render(request, "login/index.html")
 
 
 def signin(request):
+    signup_success = None
     if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
@@ -27,12 +28,12 @@ def signin(request):
 
         if user is not None:
             login(request, user)
-            return render(request, "login/index.html", {'name': username})
+            return redirect("home")
         else:
             messages.error(request, "Incorrect username or password.")
-            return redirect("home")
+            return redirect("signin")
     else:
-        if messages.get_messages(request):
+        if request.method == "GET" and messages.get_messages(request):
             messages_list = messages.get_messages(request)
             for message in messages_list:
                 if message.tags == "success":
