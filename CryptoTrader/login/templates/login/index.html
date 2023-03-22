@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
     <link rel="stylesheet" href="{% static 'C:\Users\shivb\Desktop\coding bits\crypto-tradingapp\CryptoTrader\login\templates\static\style.css' %}">
+    <script src = "https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
 <body>
 
@@ -23,13 +24,37 @@
 
     <div class = "container">
         <div class = "coin-price">
-            <div class = "log"></div>
+            <div class = "logo"> <img src="{% static 'bitcoin.png' %}"></div>
             <div>
-                <h3>$000</h3>
+                <h3>£<span id = bitcoin> </span></h3>
                 <h3>Bitcoin</h3>
             </div>
         </div>
     </div>
+    <div class = "coin-price">
+        <div class = "logo"> <img src="{% static 'ethereum.png' %}"></div>
+        <div>
+            <h3>£<span id = ethereum> </span></h3>
+            <h3>Ethereum</h3>
+        </div>
+    </div>
+</div>
+<div class = "coin-price">
+    <div class = "logo"> <img src="{% static 'dogecoin.png' %}"></div>
+    <div>
+        <h3>£<span id = dogecoin> </span></h3>
+        <h3>Dogecoin</h3>
+    </div>
+</div>
+</div>
+<div class = "coin-price">
+    <div class = "logo"> <img src="{% static 'solana.png' %}"></div>
+    <div>
+        <h3>£<span id = solana> </span></h3>
+        <h3>Solana</h3>
+    </div>
+</div>
+</div>
 
     {% else %}
     <button type="submit"><a href="/signup">SignUp</a></button>
@@ -37,5 +62,6 @@
     <br/>
     <button type="submit"><a href="/signin">SignIn</a></button>
     {% endif %}
+    <script src="{% static 'price.js' %}"></script>
 </body>
 </html>
