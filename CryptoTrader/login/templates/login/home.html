@@ -1,12 +1,62 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Home Page</title>
+    <link rel="stylesheet" href="..\static\style.css">
+    <script src = "https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
 <body>
-        <h1>HOME</h1>
+    <header>
+        <h3>Welcome to the Crypto Trader simulator, {{user.username}}!</h3>
+    </header>
+    {% if user.is_authenticated %}
+    <div class="loggedin">
+        <h4>You're successfully logged in.</h4>
+        <button type="submit"><a href="/signout">Sign Out</a></button>
+        <h3>Live Coin Price:</h3>
+    </div>
+
+    <div class="container">
+        <div class="coin-price">
+            <div class="logo"><img src="{% static 'bitcoin.png' %}"></div>
+            <div>
+                <h3>£<span id="bitcoin"></span></h3>
+                <h3>Bitcoin</h3>
+            </div>
+        </div>
+        <div class="coin-price">
+            <div class="logo"><img src="{% static 'ethereum.png' %}"></div>
+            <div>
+                <h3>£<span id="ethereum"></span></h3>
+                <h3>Ethereum</h3>
+            </div>
+        </div>
+        <div class="coin-price">
+            <div class="logo"><img src="{% static 'dogecoin.png' %}"></div>
+            <div>
+                <h3>£<span id="dogecoin"></span></h3>
+                <h3>Dogecoin</h3>
+            </div>
+        </div>
+        <div class="coin-price">
+            <div class="logo"><img src="{% static 'solana.png' %}"></div>
+            <div>
+                <h3>£<span id="solana"></span></h3>
+                <h3>Solana</h3>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <button type="submit"><a href="/signup">SignUp</a></button>
+    <br/>
+    <br/>
+    <button type="submit"><a href="/signin">SignIn</a></button>
+    {% endif %}
+    <script src="{% static 'price.js' %}"></script>
 </body>
 </html>
