@@ -1,46 +1,44 @@
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
+from django.template.loader import render_to_string
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage, send_mail
 from django.db.utils import IntegrityError
 from CryptoTrader import settings
-from django.contrib.auth import authenticate, login, logout
-import base64
-from googleapiclient.errors import HttpError
-from googleapiclient.discovery import build
-from google.oauth2 import service_account
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
+from django.contrib.auth.models import User
+from django.contrib import messages
 
+# from geeksforgeeks import settings
+# from django.contrib.sites.shortcuts import get_current_site
+# from django.template.loader import render_to_string
+# from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+# from django.utils.encoding import force_bytes, force_text
+from django.contrib.auth import authenticate, login, logout
+# from . tokens import generate_token
+
+
+# Create your views here.
 
 def index(request):
-    return render(request, "login/login.html")
-
+    responseData = render_to_string("login\login.html")
+    return HttpResponse(responseData)
 
 def signin(request):
     if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
         
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(username = username, password = password)
 
         if user is not None:
             login(request, user)
-            return render(request, "login/index.html", {'name': username})
+            fname = user.username
+            return render (request, "login/index.html", {'name': username})
         else:
-            messages.error(request, "Incorrect username or password.")
+            messages.error(request, "incorrect username or password")
             return redirect("home")
-    else:
-        if messages.get_messages(request):
-            messages_list = messages.get_messages(request)
-            for message in messages_list:
-                if message.tags == "success":
-                    signup_success = message
-            return render(request, "login/signin.html", {"signup_success": signup_success})
-        else:
-            return render(request, "login/signin.html")
-
+    return render(request, "login/signin.html")
 
 def signout(request):
     logout(request)
@@ -54,60 +52,35 @@ def signup(request):
         password = request.POST["password"]
         email = request.POST["email"]
 
-        if User.objects.filter(username=username).exists():
+        if User.objects.filter(username = username):
             messages.error(request, "username already exists, try another username")
-            return redirect("signup")
+            return redirect("home")
         
-        # if User.objects.filter(email=email).exists():
-        #     messages.error(request, "email is already registered")
-        #     return redirect("signup")
+        if User.objects.filter(email = email):
+            messages.error(request, "email is already registered")
+            return redirect("home")
         
         if len(username) > 10:
             messages.error(request, "username must be under 10 characters")
-            return redirect("signup")
     
         try:
-            user = User.objects.create_user(username=username, email=email, password=password)
-            messages.success(request, "Your account has been created. Please sign in to continue.")
+            myuser = User.objects.create_user(username, email, password)
         except IntegrityError:
             messages.error(request, "Username already exists.")
-            return redirect("signup")
-        
-        # send welcome email
-        subject = "Welcome to the Crypto Trader"
-        message = f"Hello {user.username}!!\nWelcome to our crypto trading simulator. We have sent you a confirmation email, please confirm your email address in order to activate your account." 
+            error_message = "Username already exists."
+            return render(request, "login/error.html", {"error_message": error_message})
+
+        messages.success(request, "Your account has been made!")
+
+        # welcome email
+
+        subject = "welcome to the crypto trader"
+        message = "Hello " + myuser.username + "!! \n" + "welcome to our crypto trading simulator \n we have sent you a confirmation email, please confirm your email address in order to activate your account" 
         from_email = settings.EMAIL_HOST_USER
-        to_list = [user.email]
-        send_mail(subject, message, from_email, to_list, fail_silently=True)
+        to_list = [myuser.email]
+        send_mail(subject, message, from_email, to_list, fail_silently = True)
 
         return redirect("signin")
 
     else:
         return render(request, "login/signup.html")
-        
-# Paste the code from the previous prompt here
-def send_email(to, subject, body):
-    try:
-        credentials = service_account.Credentials.from_service_account_file(
-            'CryptoTrader/services/client_secret_1805964169-9a94vdqv054k28qe7t2v9u9r452f23bk.apps.googleusercontent.com.json',
-            scopes=['https://www.googleapis.com/auth/gmail.compose']
-        )
-
-        service = build('gmail', 'v1', credentials=credentials)
-
-        message = MIMEMultipart()
-        message['to'] = to
-        message['subject'] = subject
-
-        text = MIMEText(body)
-        message.attach(text)
-
-        raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode('utf-8')
-
-        send_message = (service.users().messages().send(userId="me", body={'raw': raw_message}).execute())
-
-        print(F'sent message to {to} Message Id: {send_message["id"]}')
-    except HttpError as error:
-        print(F'An error occurred: {error}')
-        send_message = None
-    return send_message

@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
+    <link rel="stylesheet" href="{% static 'C:\Users\shivb\Desktop\coding bits\crypto-tradingapp\CryptoTrader\login\templates\static\style.css' %}">
 </head>
 <body>
 
@@ -17,6 +19,18 @@
     <h3>Hello!</h3>
     <h4>You're successfully logged in.</h4>
     <button type="submit"><a href="/signout">SignOut</a></button>
+    <h3>Live Coin Price</h3>
+
+    <div class = "container">
+        <div class = "coin-price">
+            <div class = "log"></div>
+            <div>
+                <h3>$000</h3>
+                <h3>Bitcoin</h3>
+            </div>
+        </div>
+    </div>
+
     {% else %}
     <button type="submit"><a href="/signup">SignUp</a></button>
     <br/>
