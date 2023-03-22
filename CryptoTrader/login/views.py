@@ -15,10 +15,10 @@ from email.mime.text import MIMEText
 
 
 def index(request):
-    return render(request, "login/index.html")
+    return render(request, "login/signin.html")
 
 def home(request):
-    return render(request, "/Users/maxwardle/Desktop/Bootcamp/Team Projects/crypto-tradingapp-2/CryptoTrader/login/templates/home.html")
+    return render(request, "login/home.html")
 
 def signin(request):
     signup_success = None
