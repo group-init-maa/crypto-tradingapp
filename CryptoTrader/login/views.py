@@ -17,6 +17,8 @@ from email.mime.text import MIMEText
 def index(request):
     return render(request, "login/index.html")
 
+def home(request):
+    return render(request, "/Users/maxwardle/Desktop/Bootcamp/Team Projects/crypto-tradingapp-2/CryptoTrader/login/templates/home.html")
 
 def signin(request):
     signup_success = None
@@ -46,7 +48,7 @@ def signin(request):
 def signout(request):
     logout(request)
     messages.success(request, "logged out successfully!")
-    return redirect("home")
+    return redirect("loginpage")
 
 
 def signup(request):
