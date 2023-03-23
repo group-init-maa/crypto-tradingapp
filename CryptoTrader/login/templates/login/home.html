@@ -15,12 +15,18 @@
     </header>
     {% if user.is_authenticated %}
     <div class="loggedin">
-        <h4>You're successfully logged in.</h4>
-        <button type="submit"><a href="/signout">Sign Out</a></button>
-        <h3>Live Coin Price:</h3>
+        <nav>
+            <ul>
+                <li><a href="/home">Home</a></li>
+                <li><a href="/home">Account</a></li>
+                <li><a href="/signout">Contact Us</a></li>
+                <li><a href="/signout">Sign Out</a></li>
+            </ul>
+        </nav>
     </div>
 
     <div class="container">
+        <h3>Live Coin Price:</h3>
         <div class="coin-price">
             <div class="logo"><img src="{% static 'bitcoin.png' %}"></div>
             <div>

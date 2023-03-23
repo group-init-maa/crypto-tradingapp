@@ -8,16 +8,17 @@
     <title>Create an Account</title>
 </head>
 <body>
-        <div class="center">
-          {% for message in messages %}
-          <div class="alert alert-{{ message.tags }}{% if message.tags == 'error' %} alert-dismissible{% endif %}">
-            <strong>Message:</strong> {{ message }}
-            {% if message.tags == 'error' %}
-              <a href="#close-alert" class="close">&times;</a>
-            {% endif %}
+        <div class="center" >
+          <div id="close-alert">
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }}{% if message.tags == 'error' %} alert-dismissible{% endif %}">
+                <strong>Message:</strong> {{ message }}
+                {% if message.tags == 'error' %}
+                  <a href="#close-alert" class="close">&times;</a>
+                {% endif %}
+              </div>
+            {% endfor %}
           </div>
-        {% endfor %}
-        <a id="close-alert"></a>
 
           <h1>Login</h1>
           <form action="/signup" method="post">
@@ -43,5 +44,11 @@
             </div>
           </form>
         </div>
+        <script>
+          document.getElementById('close-alert').addEventListener('click', function() {
+            document.getElementById('close-alert').style.display = 'none';
+          });          
+        </script>
+        
 </body>
 </html>
