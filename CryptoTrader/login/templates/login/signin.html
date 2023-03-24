@@ -8,18 +8,17 @@
     <title>Log In</title>
 </head>
 <body>
-    <body>
-        <div class="center">
-
+      <div class="center" >
+        <div id="close-alert">
           {% for message in messages %}
-          <div class="alert alert-{{ message.tags }}{% if message.tags == 'error' %} alert-dismissible{% endif %}">
-            <strong>Message:</strong> {{ message }}
-            {% if message.tags == 'error' %}
-              <a href="#close-alert" class="close">&times;</a>
-            {% endif %}
-          </div>
-        {% endfor %}
-        <a id="close-alert"></a>
+            <div class="alert alert-{{ message.tags }}{% if message.tags == 'error' %} alert-dismissible{% endif %}">
+              <strong>Message:</strong> {{ message }}
+              {% if message.tags == 'error' %}
+                <a href="#close-alert" class="close"></a>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
 
           <h1>Login</h1>
           <form action="/signin" method="post">
@@ -40,6 +39,10 @@
             </div>
           </form>
         </div>
-    
+        <script>
+          document.getElementById('close-alert').addEventListener('click', function() {
+            document.getElementById('close-alert').style.display = 'none';
+          });          
+        </script>
       </body>
 </html>

@@ -14,7 +14,7 @@
               <div class="alert alert-{{ message.tags }}{% if message.tags == 'error' %} alert-dismissible{% endif %}">
                 <strong>Message:</strong> {{ message }}
                 {% if message.tags == 'error' %}
-                  <a href="#close-alert" class="close">&times;</a>
+                  <a href="#close-alert" class="close"></a>
                 {% endif %}
               </div>
             {% endfor %}
