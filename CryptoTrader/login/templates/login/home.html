@@ -8,6 +8,8 @@
     <title>Home Page</title>
     <link rel="stylesheet" href="..\static\style.css">
     <script src = "https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
     <header>
@@ -36,6 +38,7 @@
                     <div>
                         <h3>£<span id="bitcoin"></span></h3>
                         <h3>Bitcoin</h3>
+                        <button id="viewgraph" onClick = drawgraph("bitcoin")>View graph</button>
                     </div>
                 </div>
                 <div class="coin-price">
@@ -43,6 +46,7 @@
                     <div>
                         <h3>£<span id="ethereum"></span></h3>
                         <h3>Ethereum</h3>
+                        <button id="viewgraph" onClick = drawgraph("ethereum")>View graph</button>
                     </div>
                 </div>
                 <div class="coin-price">
@@ -50,6 +54,15 @@
                     <div>
                         <h3>£<span id="dogecoin"></span></h3>
                         <h3>Dogecoin</h3>
+                        <button id="viewgraph" onClick = drawgraph("dogecoin")>View graph</button>
+                    </div>
+                </div>
+                <div class="coin-price">
+                    <div class="logo"><img src="{% static 'solana.png' %}"></div>
+                    <div>
+                        <h3>£<span id="solana"></span></h3>
+                        <h3>Solana</h3>
+                        <button id="viewgraph" onClick = drawgraph("solana")>View graph</button>
                     </div>
                 </div>
                 <div class="coin-price">
@@ -73,16 +86,14 @@
                         <h3>Solana</h3>
                     </div>
                 </div>
-                <div class="coin-price">
-                    <div class="logo"><img src="{% static 'solana.png' %}"></div>
-                    <div>
-                        <h3>£<span id="solana"></span></h3>
-                        <h3>Solana</h3>
-                    </div>
-                </div>
+                
             </div>
             <div id="graph">
-                g
+                <div id="canvasdiv">
+                    <canvas id="myChart"></canvas>
+                </div>
+                <button id="destroybutton" onClick = destroycharts()>Clear graphs</button>
+                <script src="../static/chart.js"></script>
             </div>
         </div>
     </div>
