@@ -26,7 +26,14 @@
             </ul>
         </nav>
     </div>
-
+    
+    <form action="account" method="post">
+        {% csrf_token %}
+            <input type="text" id="username" name="username" required>
+            <span></span>
+            <label>Create</label>
+        <input type="submit" value="Create a portfolio">
+    </form>
     <div class="container">
         <div id="statsbox">
             s
@@ -47,6 +54,7 @@
                         <h3>£<span id="ethereum"></span></h3>
                         <h3>Ethereum</h3>
                         <button id="viewgraph" onClick = drawgraph("ethereum")>View graph</button>
+                        
                     </div>
                 </div>
                 <div class="coin-price">

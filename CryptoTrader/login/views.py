@@ -1,6 +1,8 @@
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from django.contrib.auth.models import User
+import requests
+from .models import Portfolio, Coin
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.db.utils import IntegrityError
@@ -114,3 +116,24 @@ def send_email(to, subject, body):
         print(F'An error occurred: {error}')
         send_message = None
     return send_message
+
+def account(request):
+    username = request.POST["username"]
+    singleuser = Portfolio.objects.create(username=username)
+
+def populatecoin(request):
+    # Defining Binance API URL
+    key = "https://api.binance.com/api/v3/ticker/price?symbol="
+
+    # Making list for multiple crypto's
+    currencies = ["BTCUSDT", "DOGEUSDT", "LTCUSDT"]
+    j = 0
+
+    # running loop to print all crypto prices
+    for i in currencies:
+        # completing API for request
+        url = key+currencies[j]
+        data = requests.get(url)
+        data = data.json()
+        j = j+1
+        singlecoin = Coin.objects.create(name=data['symbol'], current_price = data['price'])
