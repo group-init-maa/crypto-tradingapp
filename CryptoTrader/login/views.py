@@ -1,8 +1,9 @@
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 import requests
-from .models import Portfolio, Coin
+from .models import Coin, UserProfile, Portfolio
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.db.utils import IntegrityError
@@ -20,15 +21,18 @@ def index(request):
     return render(request, "login/signin.html")
 
 def home(request):
-    # # Defining Coingecko API URL
-    # url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Cdogecoin%2Csolana&vs_currencies=gbp"
+    # Defining Coingecko API URL
+    url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Cdogecoin%2Csolana&vs_currencies=gbp"
 
-    # # Getting data from Coingecko API
-    # data = requests.get(url).json()
+    # Getting data from Coingecko API
+    data = requests.get(url).json()
 
-    # # Running loop to create coins for each crypto
-    # for crypto, price_data in data.items():
-    #     Coin.objects.create(name=crypto, current_price=price_data["gbp"])
+    # Running loop to create coins for each crypto
+    for crypto, price_data in data.items():
+        coin, created = Coin.objects.get_or_create(name=crypto)
+        coin.current_price = price_data["gbp"]
+        coin.save()
+
     return render(request, "login/home.html")
 
 def signin(request):
@@ -126,11 +130,19 @@ def send_email(to, subject, body):
         send_message = None
     return send_message
 
+@login_required
 def account(request):
     if request.method == "POST":
-        username = request.POST["username"]
-        singleuser = Portfolio.objects.create(username=username)
-    return render(request, "login/account.html")
+        user = request.user
+        user_profile, created = UserProfile.objects.get_or_create(user=user)
+        try:
+            Portfolio.objects.create(user_profile=user_profile)
+            message = "Portfolio created successfully."
+        except IntegrityError:
+            message = "Portfolio already exists for this user."
+        return render(request, 'login/account.html', {'message': message})
+    else:
+        return render(request, "login/account.html")
 
 
 
