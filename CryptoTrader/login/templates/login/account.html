@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <link rel="stylesheet" href="..\static\style.css">
+    <script src = "https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <header>
+        <h3>Welcome to the Crypto Trader simulator, {{user.username}}!</h3>
+    </header>
+    {% if user.is_authenticated %}
+    <div class="loggedin">
+        <nav>
+            <ul>
+                <li><a href="/home">Home</a></li>
+                <li><a href="/account">Account</a></li>
+                <li><a href="/signout">Contact Us</a></li>
+                <li><a href="/signout">Sign Out</a></li>
+            </ul>
+        </nav>
+    </div>
+    <form action="/account" method="post">
+        {% csrf_token %}
+        <div class="txt_field">
+          <input type="text" id="username" name="username" required>
+          <label>{{user.username}}</label>
+        </div>
+        <input type="submit" value="Create a portfolio">
+      </form>
+    {% else %}
+        <script>
+            // Redirect to sign-in page
+            window.location.href = "/signin";
+        </script>
+    {% endif %}
+</body>
+</html>
+

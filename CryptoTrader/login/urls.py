@@ -7,5 +7,5 @@ urlpatterns = [
     path("signin", views.signin, name="signin"),
     path("signout", views.signout, name="signout"),
     path("home", views.home, name="home"),
-    path("account", views.populatecoin, name="account")
+    path("account", views.account, name="account")
 ]

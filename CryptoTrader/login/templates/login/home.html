@@ -20,20 +20,13 @@
         <nav>
             <ul>
                 <li><a href="/home">Home</a></li>
-                <li><a href="/home">Account</a></li>
+                <li><a href="/account">Account</a></li>
                 <li><a href="/signout">Contact Us</a></li>
                 <li><a href="/signout">Sign Out</a></li>
             </ul>
         </nav>
     </div>
     
-    <form action="account" method="post">
-        {% csrf_token %}
-            <input type="text" id="username" name="username" required>
-            <span></span>
-            <label>Create</label>
-        <input type="submit" value="Create a portfolio">
-    </form>
     <div class="container">
         <div id="statsbox">
             s

@@ -18,3 +18,4 @@ $.ajax(livePrice).done(function(response){
     doge.innerHTML = response.dogecoin.gbp
     sol.innerHTML = response.solana.gbp
 })
+

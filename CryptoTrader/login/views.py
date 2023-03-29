@@ -20,6 +20,15 @@ def index(request):
     return render(request, "login/signin.html")
 
 def home(request):
+    # # Defining Coingecko API URL
+    # url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Cdogecoin%2Csolana&vs_currencies=gbp"
+
+    # # Getting data from Coingecko API
+    # data = requests.get(url).json()
+
+    # # Running loop to create coins for each crypto
+    # for crypto, price_data in data.items():
+    #     Coin.objects.create(name=crypto, current_price=price_data["gbp"])
     return render(request, "login/home.html")
 
 def signin(request):
@@ -118,22 +127,10 @@ def send_email(to, subject, body):
     return send_message
 
 def account(request):
-    username = request.POST["username"]
-    singleuser = Portfolio.objects.create(username=username)
+    if request.method == "POST":
+        username = request.POST["username"]
+        singleuser = Portfolio.objects.create(username=username)
+    return render(request, "login/account.html")
 
-def populatecoin(request):
-    # Defining Binance API URL
-    key = "https://api.binance.com/api/v3/ticker/price?symbol="
 
-    # Making list for multiple crypto's
-    currencies = ["BTCUSDT", "DOGEUSDT", "LTCUSDT"]
-    j = 0
 
-    # running loop to print all crypto prices
-    for i in currencies:
-        # completing API for request
-        url = key+currencies[j]
-        data = requests.get(url)
-        data = data.json()
-        j = j+1
-        singlecoin = Coin.objects.create(name=data['symbol'], current_price = data['price'])
