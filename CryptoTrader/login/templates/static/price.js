@@ -12,6 +12,11 @@ var livePrice = {
     'headers': {},
 }
 
+function buy(request){
+
+}
+
+
 $.ajax(livePrice).done(function(response){
     btc.innerHTML = response.bitcoin.gbp
     eth.innerHTML = response.ethereum.gbp

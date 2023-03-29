@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 import requests
-from .models import Coin, UserProfile, Portfolio
+from .models import Coin, UserProfile, Portfolio, Transaction
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.db.utils import IntegrityError
@@ -119,6 +119,51 @@ def send_email(to, subject, body):
         print(F'An error occurred: {error}')
         send_message = None
     return send_message
+
+from django.core.exceptions import ObjectDoesNotExist
+
+from django.core.exceptions import ObjectDoesNotExist
+
+def buy(request):
+    if request.method == 'POST':
+        amount = request.POST.get('amount')
+        coin = request.POST.get('coin')
+        
+        # Get the current user and their portfolio
+        user = request.user
+        portfolio = user.userprofile.portfolio
+        
+        try:
+            # Get the price of the coin
+            coin_obj = Coin.objects.get(name=coin)
+        except ObjectDoesNotExist:
+            messages.error(request, 'The coin you are trying to buy does not exist.')
+            return redirect('home')
+        
+        price = coin_obj.price
+        print(price)
+        print(amount)
+
+        
+        # Calculate the total cost of the transaction
+        cost = float(amount) * float(price)
+        print(cost)
+        # Check if the user has enough balance
+        if user.userprofile.balance < cost:
+            # Return an error message if the user doesn't have enough balance
+            messages.error(request, 'You do not have enough balance to complete this transaction.')
+            return redirect('home')
+        
+        # Update the user's balance and portfolio
+        user.userprofile.balance -= cost
+        transaction = Transaction(portfolio=portfolio, coin=coin_obj, transaction_type='BUY', quantity=amount, price=price)
+        transaction.save()
+        
+        # Redirect back to the home page
+        messages.success(request, 'Transaction complete.')
+        return redirect('home')
+
+
 
 @login_required
 def account(request):

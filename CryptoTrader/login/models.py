@@ -24,20 +24,19 @@ class Coin(models.Model):
         Retrieves the latest cryptocurrency prices from an API and updates the database.
         """
         url = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Cdogecoin%2Csolana&vs_currencies=gbp'
-        # params = {
-        #     'vs_currency': 'gbp',
-        #     'order': 'market_cap_desc',
-        #     'per_page': 100,
-        #     'page': 1,
-        #     'sparkline': False,
-        # }
         response = requests.get(url)
         data = response.json()
         for coin_id in data.keys():
             name = coin_id
             price = data[coin_id]['gbp']
-            coin, created = cls.objects.get_or_create(name=name, price=price)
-            coin.save()
+            try:
+                coins = cls.objects.filter(name=name)
+                for coin in coins:
+                    coin.price = price
+                    coin.save()
+            except cls.DoesNotExist:
+                coin = cls(name=name, price=price)
+                coin.save()
 
 
 

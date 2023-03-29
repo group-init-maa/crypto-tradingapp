@@ -29,7 +29,37 @@
     
     <div class="container">
         <div id="statsbox">
-            s
+            {% if user.userprofile.portfolio %}
+            <h2>Your Portfolio: </h2>
+            <p>Current Balance: £{{user.userprofile.balance}}</p>
+            <h4>Assets:</h4>
+            <table class="table">
+                <tr>
+                  <th>Coins</th>
+                  <th>Total Balance</th>
+                  <th>Price</th>
+                </tr>
+                <td>
+                    cheese
+
+                </td>
+                <td>
+                    cheese
+                </td>
+                <td>
+                    sda
+                </td>
+              </table>
+            {% endif %}
+
+            <form method="post" action="{% url 'buy' %}">
+                {% csrf_token %}
+                <input type="coin" name="coin" value="bitcoin">
+                <input type="number" name="amount" placeholder="Amount">
+                <button type="submit">Buy</button>
+            </form>
+
+            <button id="sellbutton">Sell</button>
         </div>
         <div id="cryptobox">
             <div id="coins">

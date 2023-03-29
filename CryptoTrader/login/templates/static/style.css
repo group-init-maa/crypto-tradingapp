@@ -83,22 +83,6 @@ header {
     border: 1px solid;
 }
 
-#destroybutton{
-    position: relative;
-    top: 5%;
-    left: 50%;
-    border: 4px solid #2691d9;
-    background: #2691d9;
-    border-radius: 15px;
-    color: #e9f4fb;
-    cursor: pointer;
-    outline: none;
-    transition: transform 0.3s ease-in-out;
-}
-
-#destroybutton:hover{
-    transform: scale(1.1);
-}
 
 #viewgraph{
     position: relative;
@@ -114,11 +98,52 @@ header {
 
 #viewgraph:hover{
     transform: scale(1.1);
-  }
-
-#myChart{
 }
 
+#destroybutton{
+    position: relative;
+    top: 5%;
+    left: 42%;
+    border: 4px solid #2691d9;
+    background: #2691d9;
+    border-radius: 15px;
+    color: #e9f4fb;
+    cursor: pointer;
+    outline: none;
+    transition: transform 0.3s ease-in-out;
+}
+
+#destroybutton:hover{
+    transform: scale(1.1);
+}
+
+#buybutton {
+    position: relative;
+    top: 5%;
+    left: 10%;
+    border: 4px solid #2691d9;
+    background: #2691d9;
+    border-radius: 15px;
+    color: #e9f4fb;
+    cursor: pointer;
+    outline: none;
+    transition: transform 0.3s ease-in-out;
+    font-size: 18px;
+}
+
+#sellbutton {
+    position: relative;
+    top: 5%;
+    left: 70%;
+    border: 4px solid #2691d9;
+    background: #2691d9;
+    border-radius: 15px;
+    color: #e9f4fb;
+    cursor: pointer;
+    outline: none;
+    transition: transform 0.3s ease-in-out;
+    font-size: 18px;
+}
 /* --------------------------- Graph Div ⬆ --------------------------- */
 
 /* --------------------------- Cryptobox ⬆ --------------------------- */
@@ -199,3 +224,6 @@ nav li a {
     border-radius: 3px;
 }
 
+.table{
+    border: 1px solid black;
+}
