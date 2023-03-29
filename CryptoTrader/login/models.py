@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
+import requests
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -11,11 +12,34 @@ class UserProfile(models.Model):
 
 class Coin(models.Model):
     name = models.CharField(max_length=100)
-    symbol = models.CharField(max_length=10)
-    current_price = models.DecimalField(max_digits=16, decimal_places=2)
+    symbol = models.CharField(max_length=20)
+    image_url = models.URLField(default="")
+    price = models.DecimalField(max_digits=20, decimal_places=2, default=0)
+    market_cap = models.DecimalField(max_digits=20, decimal_places=2, default=0)
+    last_updated = models.DateTimeField(default="2022-03-02")
 
-    def __str__(self):
-        return self.symbol
+    @classmethod
+    def update_prices(cls):
+        """
+        Retrieves the latest cryptocurrency prices from an API and updates the database.
+        """
+        url = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Cdogecoin%2Csolana&vs_currencies=gbp'
+        # params = {
+        #     'vs_currency': 'gbp',
+        #     'order': 'market_cap_desc',
+        #     'per_page': 100,
+        #     'page': 1,
+        #     'sparkline': False,
+        # }
+        response = requests.get(url)
+        data = response.json()
+        for coin_id in data.keys():
+            name = coin_id
+            price = data[coin_id]['gbp']
+            coin, created = cls.objects.get_or_create(name=name, price=price)
+            coin.save()
+
+
 
 class Portfolio(models.Model):
     user_profile = models.OneToOneField(UserProfile, on_delete=models.CASCADE, null=True, default=None)

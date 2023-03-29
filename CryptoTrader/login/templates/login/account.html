@@ -25,6 +25,7 @@
     </div>
     {% if user.userprofile.portfolio %}
         <p>Current value : {{user.userprofile.balance}} </p>
+        <button>Add Coin</button>
 
     {% else %}
         <form action="/account" method="post">
