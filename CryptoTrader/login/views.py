@@ -1,6 +1,6 @@
 import json
 from django.shortcuts import redirect, render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 import requests
@@ -228,17 +228,9 @@ def sell(request):
 
 @login_required
 def account(request):
-    if request.method == "POST":
-        user = request.user
-        user_profile, created = UserProfile.objects.get_or_create(user=user)
-        try:
-            Portfolio.objects.create(user_profile=user_profile)
-            message = "Portfolio created successfully."
-        except IntegrityError:
-            message = "Portfolio already exists for this user."
-        return render(request, 'login/account.html', {'message': message})
-    else:
-        return render(request, "login/account.html")
+    user_profile = request.user.userprofile
+    coins = user_profile.portfolio.coins.all().values()
+    return JsonResponse(list(coins), safe=False)
 
 
 

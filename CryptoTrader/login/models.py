@@ -29,6 +29,8 @@ class Coin(models.Model):
     image_url = models.URLField(default="")
     price = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     market_cap = models.DecimalField(max_digits=20, decimal_places=2, default=0)
+    price_change_24h = models.DecimalField(max_digits=20, decimal_places=2,default=0)
+    price_change_percentage_24h = models.DecimalField(max_digits=20, decimal_places=2,default=0)
     last_updated = models.DateTimeField(default="2022-03-02")
 
     @classmethod
@@ -36,23 +38,27 @@ class Coin(models.Model):
         """
         Retrieves the latest cryptocurrency prices from an API and updates the database.
         """
-        url = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Cdogecoin%2Csolana&vs_currencies=gbp'
+        url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=gbp&order=market_cap_desc&per_page=100&page=1&sparkline=false&locale=en'
         response = requests.get(url)
         data = response.json()
-        for coin_id in data.keys():
-            name = coin_id
+        for coin_data in data:
+            name = coin_data["name"]
+            symbol = coin_data["symbol"]
             try:
-                price = data[coin_id]['gbp']
+                price = coin_data['current_price']
+                image_url = coin_data['image']
+                last_updated = coin_data['last_updated']
+                price_change_24h = coin_data['price_change_24h']
+                price_change_percentage_24h = coin_data['price_change_percentage_24h']
             except KeyError:
-                print(f"Price data for {name} not found.")
+                print(f"data for {name} went wrong somewhere")
                 continue
             try:
-                coins = cls.objects.filter(name=name)
-                for coin in coins:
-                    coin.price = price
-                    coin.save()
+                coin = cls.objects.get(name=name)
+                coin.price = price
+                coin.save()
             except cls.DoesNotExist:
-                coin = cls(name=name, price=price)
+                coin = cls(name=name, symbol=symbol, price=price, image_url=image_url, last_updated=last_updated, price_change_24h=price_change_24h, price_change_percentage_24h=price_change_percentage_24h)
                 coin.save()
 
 

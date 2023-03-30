@@ -6,8 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
-    <link rel="stylesheet" href="..\static\style.css">
-    <script src = "https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link rel="stylesheet" href="../static/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
@@ -76,7 +76,6 @@
                     var balanceHistory = JSON.parse('{{ balance_history_json|safe }}');
                     var labels = balanceHistory.map(function(item) { return item[0]; });
                     var data = balanceHistory.map(function(item) { return item[1]; });
-            
                     var ctx = document.getElementById('balance-chart').getContext('2d');
                     var balanceChart = new Chart(ctx, {
                         type: 'line',
@@ -124,47 +123,19 @@
                     drawChart();
                 };
             </script>
-                
-
-
-
         </div>
         <div id="cryptobox">
             <div id="coins">
+            {% for coin in coins %}
                 <div class="coin-price">
-                    <div class="logo"><img src="{% static 'bitcoin.png' %}"></div>
+                    <div class="logo"><img src="{{ coin.image_url }}"></div>
                     <div>
-                        <h3>£<span id="bitcoin"></span></h3>
-                        <h3>Bitcoin</h3>
-                        <button id="viewgraph" onClick = drawgraph("bitcoin")>View graph</button>
+                        <h3>£<span id="{{ coin.symbol }}"></span></h3>
+                        <h3>{{ coin.name }}</h3>
+                        <button id="viewgraph" onClick = drawgraph("{{ coin.symbol }}")>View graph</button>
                     </div>
                 </div>
-                <div class="coin-price">
-                    <div class="logo"><img src="{% static 'ethereum.png' %}"></div>
-                    <div>
-                        <h3>£<span id="ethereum"></span></h3>
-                        <h3>Ethereum</h3>
-                        <button id="viewgraph" onClick = drawgraph("ethereum")>View graph</button>
-                        
-                    </div>
-                </div>
-                <div class="coin-price">
-                    <div class="logo"><img src="{% static 'dogecoin.png' %}"></div>
-                    <div>
-                        <h3>£<span id="dogecoin"></span></h3>
-                        <h3>Dogecoin</h3>
-                        <button id="viewgraph" onClick = drawgraph("dogecoin")>View graph</button>
-                    </div>
-                </div>
-                <div class="coin-price">
-                    <div class="logo"><img src="{% static 'solana.png' %}"></div>
-                    <div>
-                        <h3>£<span id="solana"></span></h3>
-                        <h3>Solana</h3>
-                        <button id="viewgraph" onClick = drawgraph("solana")>View graph</button>
-                    </div>
-                </div>
-                
+            {% endfor %}
             </div>
             <div id="graph">
                 <div id="canvasdiv">
@@ -184,4 +155,3 @@
     <script src="{% static 'price.js' %}"></script>
 </body>
 </html>
-

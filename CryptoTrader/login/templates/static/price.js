@@ -1,26 +1,19 @@
-var btc = document.getElementById("bitcoin")
-var eth = document.getElementById("ethereum")
-var doge = document.getElementById("dogecoin")
-var sol = document.getElementById("solana")
+var livePrice = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=gbp&order=market_cap_desc&per_page=100&page=1&sparkline=false&locale=en";
+$(document).ready(function() {
+    var coinsDiv = document.getElementById("coins");
 
-var livePrice = {
-    'async': true,
-    'scroosDomain': true,
-    'url': 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Cdogecoin%2Csolana&vs_currencies=gbp',
-
-    'method': "GET",
-    'headers': {},
-}
-
-function buy(request){
-
-}
-
-
-$.ajax(livePrice).done(function(response){
-    btc.innerHTML = response.bitcoin.gbp
-    eth.innerHTML = response.ethereum.gbp
-    doge.innerHTML = response.dogecoin.gbp
-    sol.innerHTML = response.solana.gbp
-})
-
+    $.ajax(livePrice).done(function(response){
+        for (var i = 0; i < response.length; i++) {
+            var coinData = response[i];
+            var coinDiv = document.createElement("div");
+            coinDiv.className = "coin-price";
+            coinDiv.innerHTML = "<div class='logo'><img src='" + coinData.image + "'></div>" +
+                                "<div>" +
+                                    "<h3>£<span id='" + "test" + "'></span></h3>" +
+                                    "<h3>" + coinData.name + "</h3>" +
+                                    "<button id='viewgraph' onClick='drawgraph(\"" + coinData.id + "\")'>View graph</button>" +
+                                "</div>";
+            coinsDiv.appendChild(coinDiv);
+        }
+    });
+});
