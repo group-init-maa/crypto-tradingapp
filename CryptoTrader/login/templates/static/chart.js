@@ -1,6 +1,6 @@
 let myChart;
 
-async function drawgraph(coin = "bitcoin") {
+async function drawgraph(coin = "Bitcoin") {
   const getMarketCharts = async (coinId, vsCurrency, days, interval) => {
     const url = `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=${vsCurrency}&days=${days}&interval=${interval}`;
     const response = await fetch(url);

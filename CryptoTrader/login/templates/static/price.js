@@ -9,11 +9,14 @@ $(document).ready(function() {
             coinDiv.className = "coin-price";
             coinDiv.innerHTML = "<div class='logo'><img src='" + coinData.image + "'></div>" +
                                 "<div>" +
-                                    "<h3>£<span id='" + "test" + "'></span></h3>" +
+                                    "<h3>£<span id='" + coinData.symbol + "'></span></h3>" +
                                     "<h3>" + coinData.name + "</h3>" +
-                                    "<button id='viewgraph' onClick='drawgraph(\"" + coinData.id + "\")'>View graph</button>" +
+                                    "<button id='viewgraph' onClick='drawgraph(" + coinData.id + ")'>View graph</button>" +
                                 "</div>";
             coinsDiv.appendChild(coinDiv);
+
+            // Update the price of the coin
+            $('#' + coinData.symbol).text(coinData.current_price.toLocaleString('en-US', {maximumFractionDigits:2}));
         }
     });
 });
