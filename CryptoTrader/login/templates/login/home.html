@@ -8,7 +8,7 @@
     <title>Home Page</title>
     <link rel="stylesheet" href="..\static\style.css">
     <script src = "https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
@@ -30,36 +30,96 @@
     <div class="container">
         <div id="statsbox">
             {% if user.userprofile.portfolio %}
-            <h2>Your Portfolio: </h2>
-            <p>Current Balance: £{{user.userprofile.balance}}</p>
-            <h4>Assets:</h4>
-            <table class="table">
+                <h2>Your Portfolio: </h2>
+                <p>Current Balance: £{{user.userprofile.balance}}</p>
+                <div id="chart-container">
+                    <canvas id="balance-chart"></canvas>
+                </div>
+                <h4>Assets:</h4>
+                <table class="table">
                 <tr>
-                  <th>Coins</th>
-                  <th>Total Balance</th>
-                  <th>Price</th>
+                    <th>Transaction history</th>
                 </tr>
-                <td>
-                    cheese
-
-                </td>
-                <td>
-                    cheese
-                </td>
-                <td>
-                    sda
-                </td>
-              </table>
+                {% for transaction in user.userprofile.portfolio.transaction_set.all %}
+                    <tr>
+                        <td>Name = {{ transaction.coin.name }}</td>
+                        <td>Quantity = {{ transaction.quantity }}</td>
+                        <td>Price bought at = {{ transaction.price }}</td>
+                    </tr>
+                {% endfor %}
+                </table>
             {% endif %}
 
-            <form method="post" action="{% url 'buy' %}">
+            <script>
+                function drawChart() {
+                    var balanceHistory = JSON.parse('{{ balance_history_json|safe }}');
+                    var labels = balanceHistory.map(function(item) { return item[0]; });
+                    var data = balanceHistory.map(function(item) { return item[1]; });
+            
+                    var ctx = document.getElementById('balance-chart').getContext('2d');
+                    var balanceChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Balance history',
+                                data: data,
+                                fill: false,
+                                borderColor: 'black'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            title: {
+                                display: true,
+                                text: 'Balance history'
+                            },
+                            scales: {
+                                xAxes: [{
+                                    type: 'time',
+                                    time: {
+                                        unit: 'day'
+                                    },
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: 'Date'
+                                    }
+                                }],
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true
+                                    },
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: 'Balance'
+                                    }
+                                }]
+                            }
+                        }
+                    });
+                }
+            
+                window.onload = function() {
+                    drawChart();
+                };
+            </script>
+                
+
+
+            <form id="buyform" method="post" action="{% url 'buy' %}">
                 {% csrf_token %}
                 <input type="coin" name="coin" value="bitcoin">
-                <input type="number" name="amount" placeholder="Amount">
-                <button type="submit">Buy</button>
+                <input type="real" name="amount" placeholder="Amount">
+                <button id="buybutton" type="submit">Buy</button>
             </form>
 
-            <button id="sellbutton">Sell</button>
+            <form id="sellform" method="post" action="{% url 'sell' %}">
+                {% csrf_token %}
+                <input type="coin" name="coin" value="bitcoin">
+                <input type="real" name="amount" placeholder="Amount">
+                <button id="sellbutton" type="submit">Sell</button>
+            </form>
+
         </div>
         <div id="cryptobox">
             <div id="coins">
@@ -94,27 +154,6 @@
                         <h3>£<span id="solana"></span></h3>
                         <h3>Solana</h3>
                         <button id="viewgraph" onClick = drawgraph("solana")>View graph</button>
-                    </div>
-                </div>
-                <div class="coin-price">
-                    <div class="logo"><img src="{% static 'solana.png' %}"></div>
-                    <div>
-                        <h3>£<span id="solana"></span></h3>
-                        <h3>Solana</h3>
-                    </div>
-                </div>
-                <div class="coin-price">
-                    <div class="logo"><img src="{% static 'solana.png' %}"></div>
-                    <div>
-                        <h3>£<span id="solana"></span></h3>
-                        <h3>Solana</h3>
-                    </div>
-                </div>
-                <div class="coin-price">
-                    <div class="logo"><img src="{% static 'solana.png' %}"></div>
-                    <div>
-                        <h3>£<span id="solana"></span></h3>
-                        <h3>Solana</h3>
                     </div>
                 </div>
                 

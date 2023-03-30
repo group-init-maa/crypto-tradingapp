@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
@@ -9,6 +10,18 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user.username
+    
+    def balance_history(self):
+        transactions = Transaction.objects.filter(portfolio=self.portfolio).order_by('timestamp')
+        balance_history = []
+        balance = self.balance
+        for transaction in transactions:
+            if transaction.transaction_type == 'BUY':
+                balance -= transaction.quantity * transaction.price
+            elif transaction.transaction_type == 'SELL':
+                balance += transaction.quantity * transaction.price
+            balance_history.append((transaction.timestamp.date(), balance))
+        return balance_history
 
 class Coin(models.Model):
     name = models.CharField(max_length=100)
@@ -28,7 +41,11 @@ class Coin(models.Model):
         data = response.json()
         for coin_id in data.keys():
             name = coin_id
-            price = data[coin_id]['gbp']
+            try:
+                price = data[coin_id]['gbp']
+            except KeyError:
+                print(f"Price data for {name} not found.")
+                continue
             try:
                 coins = cls.objects.filter(name=name)
                 for coin in coins:
@@ -62,6 +79,19 @@ class Transaction(models.Model):
     quantity = models.DecimalField(max_digits=16, decimal_places=8)
     price = models.DecimalField(max_digits=16, decimal_places=2)
     timestamp = models.DateTimeField(default=timezone.now)
+    balance = models.DecimalField(max_digits=16, decimal_places=2, default=0)
 
     def __str__(self):
         return f"{self.portfolio.user_profile.user.username} - {self.transaction_type} - {self.coin.symbol}"
+
+    def save(self, *args, **kwargs):
+        """
+        Override the default save method to update the balance after each transaction.
+        """
+        if self.transaction_type == 'BUY':
+            self.balance = self.portfolio.user_profile.balance - (Decimal(str(self.price)) * Decimal(str(self.quantity)))
+        elif self.transaction_type == 'SELL':
+            self.balance = self.portfolio.user_profile.balance + (Decimal(str(self.price)) * Decimal(str(self.quantity)))
+        self.portfolio.user_profile.balance = self.balance
+        self.portfolio.user_profile.save()
+        super().save(*args, **kwargs)
