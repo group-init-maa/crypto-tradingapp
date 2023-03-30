@@ -37,17 +37,38 @@
                 </div>
                 <h4>Assets:</h4>
                 <table class="table">
-                <tr>
-                    <th>Transaction history</th>
-                </tr>
-                {% for transaction in user.userprofile.portfolio.transaction_set.all %}
                     <tr>
-                        <td>Name = {{ transaction.coin.name }}</td>
-                        <td>Quantity = {{ transaction.quantity }}</td>
-                        <td>Price bought at = {{ transaction.price }}</td>
+                        <th>Coin Name</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Transaction type</th>
+                        <th>Transaction date</th>
                     </tr>
-                {% endfor %}
+                    {% for transaction in user.userprofile.portfolio.transaction_set.all %}
+                    <tr>
+                        <td>{{ transaction.coin.name }}</td>
+                        <td>{{ transaction.quantity }}</td>
+                        <td>{{ transaction.price }}</td>
+                        <td>{{transaction.transaction_type}}</td>
+                        <td>{{transaction.timestamp}}</td>
+                    </tr>
+                    {% endfor %}
                 </table>
+                <form id="buyform" method="post" action="{% url 'buy' %}">
+                    {% csrf_token %}
+                    <input type="coin" name="coin" value="bitcoin">
+                    <input type="real" name="amount" placeholder="Amount">
+                    <button id="buybutton" type="submit">Buy</button>
+                </form>
+    
+                <form id="sellform" method="post" action="{% url 'sell' %}">
+                    {% csrf_token %}
+                    <input type="coin" name="coin" value="bitcoin">
+                    <input type="real" name="amount" placeholder="Amount">
+                    <button id="sellbutton" type="submit">Sell</button>
+                </form>
+            {% else %}
+                <h2>Looks like you don't have a portfolio created. Click on 'Account' to make one! </h2>
             {% endif %}
 
             <script>
@@ -106,19 +127,6 @@
                 
 
 
-            <form id="buyform" method="post" action="{% url 'buy' %}">
-                {% csrf_token %}
-                <input type="coin" name="coin" value="bitcoin">
-                <input type="real" name="amount" placeholder="Amount">
-                <button id="buybutton" type="submit">Buy</button>
-            </form>
-
-            <form id="sellform" method="post" action="{% url 'sell' %}">
-                {% csrf_token %}
-                <input type="coin" name="coin" value="bitcoin">
-                <input type="real" name="amount" placeholder="Amount">
-                <button id="sellbutton" type="submit">Sell</button>
-            </form>
 
         </div>
         <div id="cryptobox">
@@ -162,7 +170,6 @@
                 <div id="canvasdiv">
                     <canvas id="myChart"></canvas>
                 </div>
-                <button id="destroybutton" onClick = destroycharts()>Clear graphs</button>
                 <script src="../static/chart.js"></script>
             </div>
         </div>
