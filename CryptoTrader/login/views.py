@@ -25,17 +25,20 @@ def index(request):
 import json
 from decimal import Decimal
 
-def home(request):
-    user_profile = request.user.userprofile
-    balance_history = user_profile.balance_history()
-    balance_history = [(str(date), float(value)) for date, value in balance_history]
 
-    context = {
+@login_required
+def home(request):
+    try:
+        user_profile = request.user.userprofile
+        balance_history = user_profile.balance_history()
+        balance_history = [(str(date), float(value)) for date, value in balance_history]
+        context = {
         'user': request.user,
         'balance_history_json': json.dumps(balance_history),
-    }
-
-    return render(request, 'login/home.html', context)
+        }
+        return render(request, 'login/home.html', context)
+    except ObjectDoesNotExist:
+        return render(request, 'login/home.html')
 
 
 def signin(request):
@@ -132,8 +135,6 @@ def send_email(to, subject, body):
         print(F'An error occurred: {error}')
         send_message = None
     return send_message
-
-from django.core.exceptions import ObjectDoesNotExist
 
 from django.core.exceptions import ObjectDoesNotExist
 
