@@ -1,7 +1,9 @@
 from decimal import Decimal
+from pyexpat.errors import messages
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
+from flask import redirect, request
 import requests
 
 class UserProfile(models.Model):
@@ -83,7 +85,7 @@ class Transaction(models.Model):
     coin = models.ForeignKey(Coin, on_delete=models.CASCADE)
     transaction_type = models.CharField(max_length=4, choices=TRANSACTION_TYPES)
     quantity = models.DecimalField(max_digits=16, decimal_places=8)
-    price = models.DecimalField(max_digits=16, decimal_places=2)
+    price = models.DecimalField(max_digits=16, decimal_places=2, default =0)
     timestamp = models.DateTimeField(default=timezone.now)
     balance = models.DecimalField(max_digits=16, decimal_places=2, default=0)
 
@@ -95,9 +97,34 @@ class Transaction(models.Model):
         Override the default save method to update the balance after each transaction.
         """
         if self.transaction_type == 'BUY':
-            self.balance = self.portfolio.user_profile.balance - (Decimal(str(self.price)) * Decimal(str(self.quantity)))
+            cost = Decimal(str(self.price)) * Decimal(str(self.quantity))
+            if self.portfolio.user_profile.balance - cost < 0:
+                raise ValueError('Insufficient balance to complete transaction.')
+            self.balance = self.portfolio.user_profile.balance - cost
+            # add the coin to the portfolio
+            if self.portfolio.coins.filter(id=self.coin.id).exists():
+                # if the coin already exists in the portfolio, update the quantity
+                transaction = self.portfolio.transaction_set.get(coin=self.coin)
+                if transaction != self:
+                    transaction.quantity += self.quantity
+                    transaction.save()
+            else:
+                # otherwise, create a new transaction with the given quantity
+                self.portfolio.coins.add(self.coin, through_defaults={'quantity': self.quantity})
         elif self.transaction_type == 'SELL':
             self.balance = self.portfolio.user_profile.balance + (Decimal(str(self.price)) * Decimal(str(self.quantity)))
+            # remove the coin from the portfolio
+            transaction = self.portfolio.transaction_set.get(coin=self.coin)
+            if transaction != self:
+                transaction.quantity -= Decimal(str(self.quantity))
+                if transaction.quantity == 0:
+                    transaction.delete()
+                else:
+                    transaction.save()
         self.portfolio.user_profile.balance = self.balance
         self.portfolio.user_profile.save()
         super().save(*args, **kwargs)
+        class Meta:
+            unique_together = ('coin', 'portfolio')
+
+

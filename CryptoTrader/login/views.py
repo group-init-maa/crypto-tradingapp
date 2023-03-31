@@ -1,20 +1,14 @@
 import json
 from django.shortcuts import redirect, render
-from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-import requests
 from .models import Coin, UserProfile, Portfolio, Transaction
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.db.utils import IntegrityError
-from CryptoTrader import settings
 from django.contrib.auth import authenticate, login, logout
-import base64
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 from decimal import Decimal
-
+from django.core.exceptions import ObjectDoesNotExist
 
 def index(request):
     return render(request, "login/signin.html")
@@ -90,12 +84,16 @@ def signup(request):
         try:
             user = User.objects.create_user(username=username, email=email, password=password)
             messages.success(request, "Your account has been created. Please sign in to continue.")
+            return redirect("signin")
         except IntegrityError:
             messages.error(request, "Username already exists.")
             return redirect("signup")
+    else:
+        return render(request, "login/signup.html")
+
         
 
-from django.core.exceptions import ObjectDoesNotExist
+
 
 def buy(request):
     if request.method == 'POST':
@@ -114,32 +112,35 @@ def buy(request):
             return redirect('home')
         
         price = coin_obj.price
-        print(price)
-        print(amount)
 
         # Calculate the total cost of the transaction
         cost = Decimal(str(amount)) * Decimal(str(price))
-        print(cost)
         
         # Check if the user has enough balance
         if user.userprofile.balance < cost:
             # Return an error message if the user doesn't have enough balance
             messages.error(request, 'You do not have enough balance to complete this transaction.')
             return redirect('home')
-        
-        # Create a new transaction object and save it
-        transaction = Transaction(portfolio=portfolio, coin=coin_obj, transaction_type='BUY', quantity=amount, price=price)
-        transaction.save()
+        else:
+            # Check if there is already a transaction for this coin and portfolio
+            try:
+                transaction = portfolio.transaction_set.filter(coin=coin_obj).first()
+                if transaction is None:
+                    # Create a new transaction object and save it
+                    transaction = Transaction(portfolio=portfolio, coin=coin_obj, transaction_type='BUY', quantity=amount, price=price, balance=user.userprofile.balance)
+                else:
+                    # If the transaction exists, update the quantity
+                    transaction.quantity += Decimal(str(amount))
+                transaction.save()
+            except ObjectDoesNotExist:
+                # Create a new transaction object and save it
+                transaction = Transaction(portfolio=portfolio, coin=coin_obj, transaction_type='BUY', quantity=amount, price=price, balance=user.userprofile.balance)
+                transaction.save()
 
-        # Deduct the cost of the transaction from the user's balance and save the changes
-        user.userprofile.balance -= Decimal(str(cost))
-        transaction.balance = user.userprofile.balance
-        user.userprofile.save()
-        transaction.save()
+            # Redirect back to the home page
+            messages.success(request, 'Transaction complete.')
+            return redirect('home')
 
-        # Redirect back to the home page
-        messages.success(request, 'Transaction complete.')
-        return redirect('home')
 
 
 def sell(request):
@@ -163,6 +164,7 @@ def sell(request):
 
         # Check if the user has enough of this coin to sell
         total_quantity = sum([transaction.quantity for transaction in transactions])
+        print(total_quantity)
         if total_quantity < Decimal(str(amount)):
             # Return an error message if the user doesn't have enough of this coin to sell
             messages.error(request, f'You do not have {amount} {coin_obj.symbol} to sell.')
@@ -171,25 +173,44 @@ def sell(request):
         # Calculate the total proceeds from the sale
         sale_proceeds = Decimal(str(amount)) * coin_obj.price
 
+        # Update the relevant transaction with the new quantity
+        quantity_to_sell = Decimal(amount)
+        for transaction in transactions:
+            if quantity_to_sell == 0:
+                break
+            if transaction.quantity <= quantity_to_sell:
+                # The entire transaction can be sold
+                quantity_to_sell -= transaction.quantity
+                transaction.delete()
+            else:
+                # Only a portion of the transaction can be sold
+                transaction.quantity -= quantity_to_sell
+                transaction.save()
+                quantity_to_sell = 0
+
+
         # Create a new transaction object for the sale and save it
         transaction = Transaction(portfolio=portfolio, coin=coin_obj, transaction_type='SELL', quantity=amount, price=coin_obj.price)
-        transaction.save()
-
-        # Add the proceeds to the user's balance and save the changes
-        user.userprofile.balance += sale_proceeds
-        transaction.balance = user.userprofile.balance
-        user.userprofile.save()
         transaction.save()
 
         # Redirect back to the home page
         messages.success(request, f'Successfully sold {amount} {coin_obj.symbol} for £{sale_proceeds}.')
         return redirect('home')
 
+
 @login_required
 def account(request):
-    user_profile = request.user.userprofile
-    coins = user_profile.portfolio.coins.all().values()
-    return JsonResponse(list(coins), safe=False)
+    if request.method == "POST":
+        user = request.user
+        user_profile, created = UserProfile.objects.get_or_create(user=user)
+        try:
+            Portfolio.objects.create(user_profile=user_profile)
+            message = "Portfolio created successfully."
+        except IntegrityError:
+            message = "Portfolio already exists for this user."
+        return render(request, 'login/account.html', {'message': message})
+    else:
+        return render(request, "login/account.html")
 
 
 
