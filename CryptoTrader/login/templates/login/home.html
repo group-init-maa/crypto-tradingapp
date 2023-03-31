@@ -12,11 +12,9 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
-    <header>
-        <h3>Welcome to the Crypto Trader simulator, {{user.username}}!</h3>
-    </header>
     {% if user.is_authenticated %}
     <div class="loggedin">
+        <img id="navlogo" src="../static/logo.png">
         <nav>
             <ul>
                 <li><a href="/home">Home</a></li>
@@ -25,8 +23,12 @@
                 <li><a href="/signout">Sign Out</a></li>
             </ul>
         </nav>
+        <div id="message-box"></div>
+        <dialog id="welcome-dialog">
+            <h2>Welcome to the Crypto Trader simulator, {{user.username}}!</h2>
+            <button id="close-dialog">Close</button>
+        </dialog>
     </div>
-    
     <div class="container">
         <div id="statsbox">
             {% if user.userprofile.portfolio %}
@@ -66,9 +68,9 @@
                     <input type="coin" name="coin" value="bitcoin">
                     <input type="real" name="amount" placeholder="Amount">
                     <button id="sellbutton" type="submit">Sell</button>
-                </form>
+                </form>v
             {% else %}
-                <h2>Looks like you don't have a portfolio created. Click on 'Account' to make one! </h2>
+                <h2 style="padding-top: 300px; text-align: center; font-size: larger;">Looks like you don't have a portfolio created. Click on 'Account' to make one! </h2>
             {% endif %}
 
             <script>
@@ -153,5 +155,6 @@
         </script>
     {% endif %}
     <script src="{% static 'price.js' %}"></script>
+    <script src="../static/chart.js"></script>
 </body>
 </html>

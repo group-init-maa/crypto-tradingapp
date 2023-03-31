@@ -138,7 +138,7 @@ header {
 #coins{
     display: flex;
     flex-direction: column;
-    width: 18%;
+    width: 23%;
     background-color: rgba(255,255,255, 0.2);
     height: 100%;
     overflow-y: auto;
@@ -280,8 +280,9 @@ a:hover{
   
 .loggedin{
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
+    background: white;
 }
 .pass{
     margin: -5px 0 20px 5px;
@@ -290,6 +291,13 @@ a:hover{
 }
 .pass:hover{
     text-decoration: underline;
+}
+
+#navlogo{
+    width: 5%;
+    height: 100%;
+    border-radius: 100%;
+    padding: 5px;
 }
 
 nav {
@@ -301,7 +309,7 @@ nav {
 
 nav ul {
     float: left;
-    margin-left: 31%;
+    margin-left: 53%;
 }
 
 nav li {
@@ -318,3 +326,16 @@ nav li a {
     border-radius: 3px;
 }
 
+#welcome-dialog {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 1rem;
+    background-color: white;
+    box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  #close-dialog {
+    float: right;
+  }
